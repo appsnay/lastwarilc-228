@@ -944,10 +944,12 @@ function computeSummary(refKey) {
   for (const m of activeMembers()) {
     const inCur  = cur.includes(m.id);
     const inPrev = prev.includes(m.id);
-    if (inCur && m.rank === 'R3')              demote.push(m);   // R3 gagal → turun ke R2
-    else if (inCur && m.rank === 'R2')         r2fail.push(m);   // R2 gagal → sudah di bawah, tidak berubah
-    else if (!inCur && inPrev && m.rank==='R2')promote.push(m);  // R2 minggu lalu gagal, kini tidak → naik ke R3
-    else                                       stable.push(m);
+    if (inCur) {
+      demote.push(m);                          // gagal minggu ini → masuk demote
+      if (m.rank === 'R2') r2fail.push(m);     // sudah R2, ranknya tidak berubah (info saja)
+    }
+    else if (inPrev) promote.push(m);          // gagal minggu lalu, tidak gagal minggu ini → promote
+    else             stable.push(m);
   }
   return { demote, promote, stable, r2fail };
 }
@@ -1340,10 +1342,10 @@ function renderSummary() {
         <div class="scard-hd">${t('demote_card')} (${demote.length})</div>
         ${demote.length===0?`<div style="color:var(--muted);font-size:13px">${t('demote_empty')}</div>`:
           demote.map(m=>`
-            <div class="smrow">
-              <span style="font-size:15px">⬇</span>
+            <div class="smrow" style="${m.rank==='R2'?'opacity:.55;':''}">
+              <span style="font-size:15px">${m.rank==='R2'?'➡':'⬇'}</span>
               <span style="flex:1;font-size:13px;font-weight:500">${esc(m.name)}</span>
-              <span style="font-size:11px;color:var(--red2)">${t('demote_arrow')}</span>
+              <span style="font-size:11px;color:${m.rank==='R2'?'var(--muted)':'var(--red2)'}">${m.rank==='R2'?t('fail_r2_note'):t('demote_arrow')}</span>
             </div>`).join('')}
       </div>
       <div class="scard pro">
