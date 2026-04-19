@@ -394,6 +394,14 @@ body::after{
 .fb-dot.ok{background:var(--green2);box-shadow:0 0 5px var(--green2)}
 .fb-dot.err{background:var(--red2)}
 
+/* ══════════ STATUS BADGE ══════════ */
+.sbadge{font-size:11px;padding:2px 8px;border-radius:10px;font-weight:600;white-space:nowrap}
+.s-join{background:rgba(46,204,113,.14);color:var(--green2)}
+.s-out {background:rgba(255,107,107,.12);color:var(--red2)}
+.shist{font-size:11px;border-top:1px solid var(--border);padding:8px 8px 8px 32px;
+  color:var(--muted);line-height:1.7;display:none}
+.shist.open{display:block}
+
 @media(max-width:600px){
   .header{flex-direction:column;align-items:flex-start}
   .nav-btn .tab-txt{display:none}
@@ -418,15 +426,15 @@ body::after{
   <div class="modal-box">
     <div class="login-ico">🔐</div>
     <div class="login-title">ADMIN LOGIN</div>
-    <div class="login-sub" style="margin-bottom:20px">Masuk sebagai admin untuk mengelola data aliansi</div>
-    <label class="modal-label">Email</label>
+    <div class="login-sub" data-t="login_sub" style="margin-bottom:20px">Masuk sebagai admin untuk mengelola data aliansi</div>
+    <label class="modal-label" data-t="login_email">Email</label>
     <input class="modal-inp" id="li-email" type="email" placeholder="admin@email.com" onkeydown="if(event.key==='Enter')document.getElementById('li-pass').focus()">
-    <label class="modal-label">Password</label>
+    <label class="modal-label" data-t="login_pass">Password</label>
     <input class="modal-inp" id="li-pass" type="password" placeholder="••••••••" onkeydown="if(event.key==='Enter')doLogin()">
     <div class="modal-err" id="li-err"></div>
     <div class="modal-acts">
-      <button class="btn btn-ghost" onclick="closeLoginModal()">Batal</button>
-      <button class="btn btn-gold" id="li-btn" onclick="doLogin()">🔑 Masuk</button>
+      <button class="btn btn-ghost" data-t="login_cancel" onclick="closeLoginModal()">Batal</button>
+      <button class="btn btn-gold" id="li-btn" data-t="login_btn" onclick="doLogin()">🔑 Masuk</button>
     </div>
   </div>
 </div>
@@ -434,14 +442,14 @@ body::after{
 <!-- ══════ EDIT NAME MODAL ══════ -->
 <div class="modal-ov" id="edit-modal">
   <div class="modal-box">
-    <div class="modal-title">✏️ Edit Nama Member</div>
-    <div class="modal-sub" id="edit-sub">Nama baru akan otomatis terupdate di semua rekap & histori.</div>
-    <label class="modal-label">Nama Baru</label>
-    <input class="modal-inp" id="edit-inp" placeholder="Masukkan nama baru..." onkeydown="if(event.key==='Enter')saveEdit();if(event.key==='Escape')closeEdit()">
+    <div class="modal-title" data-t="edit_title">✏️ Edit Nama Member</div>
+    <div class="modal-sub" id="edit-sub" data-t="edit_sub">Nama baru akan otomatis terupdate di semua rekap & histori.</div>
+    <label class="modal-label" data-t="edit_label">Nama Baru</label>
+    <input class="modal-inp" id="edit-inp" data-t-ph="edit_placeholder" placeholder="Masukkan nama baru..." onkeydown="if(event.key==='Enter')saveEdit();if(event.key==='Escape')closeEdit()">
     <div class="modal-err" id="edit-err"></div>
     <div class="modal-acts">
-      <button class="btn btn-ghost" onclick="closeEdit()">Batal</button>
-      <button class="btn btn-gold" onclick="saveEdit()">💾 Simpan</button>
+      <button class="btn btn-ghost" data-t="edit_cancel" onclick="closeEdit()">Batal</button>
+      <button class="btn btn-gold" data-t="edit_save" onclick="saveEdit()">💾 Simpan</button>
     </div>
   </div>
 </div>
@@ -454,13 +462,14 @@ body::after{
       <div class="hicon">⚔️</div>
       <div>
         <div class="htitle">LAST WAR — ILC #228</div>
-        <div class="hsub">Sistem Promote &amp; Demote Member Aliansi</div>
+        <div class="hsub" id="app-sub">Sistem Promote &amp; Demote Member Aliansi</div>
       </div>
     </div>
     <div class="hright">
       <span class="fb-status"><span class="fb-dot" id="fb-dot"></span><span id="fb-lbl">Menghubungkan…</span></span>
       <div class="week-pill" id="week-pill">—</div>
-      <button class="theme-switch" id="theme-btn" onclick="toggleTheme()" title="Ganti tema"></button>
+      <button class="theme-switch" id="lang-btn" onclick="toggleLang()" title="EN / ID">🇺🇸 EN</button>
+      <button class="theme-switch" id="theme-btn" onclick="toggleTheme()" data-t-title="theme_title" title="Ganti tema"></button>
       <div class="admin-pill" id="admin-pill" onclick="adminPillClick()">
         <span class="admin-dot off" id="adot"></span>
         <span id="apill-lbl">Login Admin</span>
@@ -523,6 +532,201 @@ window._state = {
   loaded: false,
 };
 const S = window._state;
+
+// ════════════════════════════════════════
+//  LANG / i18n
+// ════════════════════════════════════════
+window._lang = localStorage.getItem('ilc-lang') || 'id';
+const LANG = {
+id:{
+  hsub:'Sistem Promote & Demote Member Aliansi',
+  fb_connecting:'Menghubungkan…',fb_connected:'Terhubung',fb_offline:'Offline',
+  theme_title:'Ganti tema',
+  admin_logout:'👑 Admin — Logout',admin_login_lock:'🔒 Login Admin',
+  tab_summary:'Summary',tab_history:'History',tab_alwaysfail:'Sering Gagal',
+  tab_inputfail:'Input Fail',tab_master:'Master Member',
+  admin_only:'🔒 Halaman ini khusus Admin.',
+  login_sub:'Masuk sebagai admin untuk mengelola data aliansi',
+  login_email:'Email',login_pass:'Password',
+  login_cancel:'Batal',login_btn:'🔑 Masuk',login_processing:'Memproses…',
+  login_success:'✅ Login berhasil! Selamat datang, Admin.',
+  login_fail:'Login gagal. Periksa email & password.',
+  login_wrong_cred:'Email atau password salah.',
+  login_too_many:'Terlalu banyak percobaan. Coba lagi nanti.',
+  login_empty:'Email dan password wajib diisi.',
+  logout_success:'👋 Logout berhasil.',
+  edit_title:'✏️ Edit Nama Member',
+  edit_sub:'Nama baru akan otomatis terupdate di semua rekap & histori.',
+  edit_sub_cur:'Nama saat ini:',
+  edit_label:'Nama Baru',edit_placeholder:'Masukkan nama baru...',
+  edit_cancel:'Batal',edit_save:'💾 Simpan',
+  edit_empty:'Nama tidak boleh kosong!',
+  edit_dup:'Nama sudah dipakai member lain!',
+  edit_success:'✅ Nama berhasil diubah.',
+  master_add_title:'➕ Tambah Member',master_add_ph:'Nama member...',
+  master_add_btn:'+ Tambah',master_list_title:'👥 Daftar Member',
+  master_import_btn:'⬆ Import',master_search_ph:'Cari nama...',
+  master_empty:'Belum ada member',master_empty_search:'Belum ada member cocok',
+  master_import_title:'⬆ Import Member (satu nama per baris)',
+  master_import_hint:'Duplikat nama akan diabaikan otomatis. Semua ditambahkan sebagai R3.',
+  master_import_ph:'NamaMember1\nNamaMember2\n...',
+  master_import_cancel:'Batal',master_import_do:'Import',
+  master_imported:'member diimport!',master_import_none:'Tidak ada member baru yang ditambahkan.',
+  master_added:'✅ Member ditambahkan.',master_dup:'❌ Nama sudah ada!',
+  master_deleted:'🗑 Member dihapus.',master_del_confirm:'Hapus member ini?',
+  master_rank_changed:'✅ Rank diubah.',
+  fail_week_title:'📅 Minggu Aktif',fail_week_label:'⚠ Data fail untuk:',
+  fail_week_change:'Ubah minggu:',fail_list_title:'❌ Member Gagal',
+  fail_clear_btn:'Hapus Semua',
+  fail_hint:'💡 Ketik nama member yang gagal ≥7.2 juta poin, lalu Enter atau pilih dari daftar.',
+  fail_search_ph:'Cari nama member gagal...',
+  fail_empty:'Belum ada input gagal minggu ini.',fail_r2_note:'sudah R2',
+  fail_added:'✅ Member ditambahkan ke daftar gagal.',
+  fail_removed:'✅ Member dihapus dari daftar gagal.',
+  fail_clear_confirm:'Hapus semua fail minggu ini?',fail_cleared:'🗑 Data fail dihapus.',
+  pub_view_only:'👁 Mode Publik — Hanya bisa melihat. Login sebagai Admin untuk mengedit.',
+  pub_edit_only:'👁 Mode Publik — Login sebagai Admin untuk mengedit.',
+  pub_login_btn:'🔑 Login',
+  summary_title:'📊 Summary Rekap',summary_apply_btn:'⚡ Terapkan Rank',
+  summary_export_btn:'⬇ Export',summary_week_label:'📅 Pilih Minggu:',
+  summary_latest_badge:'TERBARU',summary_vs:'— dibanding',
+  summary_no_prev:'— (belum ada data minggu sebelumnya)',
+  summary_total:'Total Member',summary_demote:'⬇ Demote R3→R2',
+  summary_promote:'⬆ Promote R2→R3',summary_stable:'✓ Stabil',
+  summary_r2fail:'R2 Gagal (tetap)',
+  summary_week_latest:'🔴 (Terbaru)',summary_week_now:'★ (Minggu Ini)',
+  demote_card:'⬇ DEMOTE ke R2',demote_empty:'Tidak ada yang demote minggu ini 🎉',
+  demote_arrow:'→ R2',promote_card:'⬆ PROMOTE ke R3',
+  promote_empty:'Belum ada yang promote minggu ini.',promote_arrow:'→ R3',
+  r2fail_card:'⚠ R2 Gagal — Rank Tetap',
+  r2fail_desc:'Member berikut gagal minggu ini namun sudah berada di R2 — rank tidak berubah.',
+  stable_card:'✅ Stabil R3',
+  rank_applied:'rank diperbarui',rank_demote_lbl:'demote → R2',rank_promote_lbl:'promote → R3',
+  rank_no_change:'ℹ Tidak ada perubahan rank.',
+  export_hdr:'REKAP PROMOTE & DEMOTE — Last War ILC #228',
+  export_week:'Minggu:',export_vs:'Dibanding:',
+  export_demote:'⬇ DEMOTE KE R2',export_promote:'⬆ PROMOTE KE R3',
+  export_stable:'✅ STABIL R3',export_r2fail:'⚠ R2 GAGAL — RANK TETAP',
+  export_total:'Total member:',
+  history_title:'📜 History Fail Per Minggu',history_empty:'Belum ada data history.',
+  history_fail_badge:'fail',history_no_fail:'Tidak ada member fail.',
+  history_del_btn:'🗑 Hapus Minggu Ini',
+  history_del_confirm:'Hapus data fail untuk',history_deleted:'🗑 Data minggu dihapus.',
+  af_title:'🚨 Player Sering Gagal',
+  af_desc_pre:'Berdasarkan',af_desc_week:'minggu',af_desc_mid:'data history. Menampilkan player yang gagal minimal',
+  af_filter_lbl:'Filter min. fail:',
+  af_stat_weeks:'Total Minggu',af_stat_players:'Player Bermasalah',af_stat_streak:'🔥 Streak ≥2',
+  af_empty_pre:'Tidak ada player yang gagal ≥',
+  af_list_title:'📋 Daftar Player',af_streak:'x streak',af_fail_at:'Fail di:',
+  loading:'Memuat data…',
+  status_join:'Join',status_out:'Out',
+  status_toggle_out:'🚪 Tandai Out',status_toggle_join:'✅ Tandai Join',
+  status_history:'Riwayat Status',
+  status_toast_join:'✅ Status diubah ke Join.',status_toast_out:'🚪 Status diubah ke Out.',
+},
+en:{
+  hsub:'Alliance Promote & Demote System',
+  fb_connecting:'Connecting…',fb_connected:'Connected',fb_offline:'Offline',
+  theme_title:'Toggle theme',
+  admin_logout:'👑 Admin — Logout',admin_login_lock:'🔒 Admin Login',
+  tab_summary:'Summary',tab_history:'History',tab_alwaysfail:'Frequent Fails',
+  tab_inputfail:'Input Fail',tab_master:'Member List',
+  admin_only:'🔒 This page is Admin only.',
+  login_sub:'Sign in as admin to manage alliance data',
+  login_email:'Email',login_pass:'Password',
+  login_cancel:'Cancel',login_btn:'🔑 Sign In',login_processing:'Processing…',
+  login_success:'✅ Login successful! Welcome, Admin.',
+  login_fail:'Login failed. Check your email & password.',
+  login_wrong_cred:'Incorrect email or password.',
+  login_too_many:'Too many attempts. Try again later.',
+  login_empty:'Email and password are required.',
+  logout_success:'👋 Logged out successfully.',
+  edit_title:'✏️ Edit Member Name',
+  edit_sub:'New name will be updated across all records & history.',
+  edit_sub_cur:'Current name:',
+  edit_label:'New Name',edit_placeholder:'Enter new name...',
+  edit_cancel:'Cancel',edit_save:'💾 Save',
+  edit_empty:'Name cannot be empty!',
+  edit_dup:'Name already used by another member!',
+  edit_success:'✅ Name updated successfully.',
+  master_add_title:'➕ Add Member',master_add_ph:'Member name...',
+  master_add_btn:'+ Add',master_list_title:'👥 Member List',
+  master_import_btn:'⬆ Import',master_search_ph:'Search name...',
+  master_empty:'No members yet',master_empty_search:'No matching members',
+  master_import_title:'⬆ Import Members (one name per line)',
+  master_import_hint:'Duplicates ignored automatically. All added as R3.',
+  master_import_ph:'MemberName1\nMemberName2\n...',
+  master_import_cancel:'Cancel',master_import_do:'Import',
+  master_imported:'members imported!',master_import_none:'No new members added.',
+  master_added:'✅ Member added.',master_dup:'❌ Name already exists!',
+  master_deleted:'🗑 Member deleted.',master_del_confirm:'Delete this member?',
+  master_rank_changed:'✅ Rank changed.',
+  fail_week_title:'📅 Active Week',fail_week_label:'⚠ Fail data for:',
+  fail_week_change:'Change week:',fail_list_title:'❌ Failed Members',
+  fail_clear_btn:'Clear All',
+  fail_hint:'💡 Type member names who failed ≥7.2M points, then press Enter or select from list.',
+  fail_search_ph:'Search failed member...',
+  fail_empty:'No fail input for this week yet.',fail_r2_note:'already R2',
+  fail_added:'✅ Member added to fail list.',
+  fail_removed:'✅ Member removed from fail list.',
+  fail_clear_confirm:'Clear all fails for this week?',fail_cleared:'🗑 Fail data cleared.',
+  pub_view_only:'👁 Public Mode — View only. Login as Admin to edit.',
+  pub_edit_only:'👁 Public Mode — Login as Admin to edit.',
+  pub_login_btn:'🔑 Login',
+  summary_title:'📊 Summary',summary_apply_btn:'⚡ Apply Ranks',
+  summary_export_btn:'⬇ Export',summary_week_label:'📅 Select Week:',
+  summary_latest_badge:'LATEST',summary_vs:'— compared to',
+  summary_no_prev:'— (no previous week data)',
+  summary_total:'Total Members',summary_demote:'⬇ Demote R3→R2',
+  summary_promote:'⬆ Promote R2→R3',summary_stable:'✓ Stable',
+  summary_r2fail:'R2 Failed (no change)',
+  summary_week_latest:'🔴 (Latest)',summary_week_now:'★ (This Week)',
+  demote_card:'⬇ DEMOTE to R2',demote_empty:'Nobody demoted this week 🎉',
+  demote_arrow:'→ R2',promote_card:'⬆ PROMOTE to R3',
+  promote_empty:'Nobody promoted this week.',promote_arrow:'→ R3',
+  r2fail_card:'⚠ R2 Failed — Rank Unchanged',
+  r2fail_desc:'These members failed this week but are already R2 — rank stays the same.',
+  stable_card:'✅ Stable R3',
+  rank_applied:'ranks updated',rank_demote_lbl:'demote → R2',rank_promote_lbl:'promote → R3',
+  rank_no_change:'ℹ No rank changes.',
+  export_hdr:'PROMOTE & DEMOTE RECAP — Last War ILC #228',
+  export_week:'Week:',export_vs:'Compared to:',
+  export_demote:'⬇ DEMOTE TO R2',export_promote:'⬆ PROMOTE TO R3',
+  export_stable:'✅ STABLE R3',export_r2fail:'⚠ R2 FAILED — RANK UNCHANGED',
+  export_total:'Total members:',
+  history_title:'📜 Weekly Fail History',history_empty:'No history data yet.',
+  history_fail_badge:'fail',history_no_fail:'No failed members.',
+  history_del_btn:'🗑 Delete This Week',
+  history_del_confirm:'Delete fail data for',history_deleted:'🗑 Week data deleted.',
+  af_title:'🚨 Frequent Faillers',
+  af_desc_pre:'Based on',af_desc_week:'weeks',af_desc_mid:'of history. Showing players who failed at least',
+  af_filter_lbl:'Min. fail filter:',
+  af_stat_weeks:'Total Weeks',af_stat_players:'Problematic Players',af_stat_streak:'🔥 Streak ≥2',
+  af_empty_pre:'No player failed ≥',
+  af_list_title:'📋 Player List',af_streak:'x streak',af_fail_at:'Fails in:',
+  loading:'Loading data…',
+  status_join:'Join',status_out:'Out',
+  status_toggle_out:'🚪 Mark Out',status_toggle_join:'✅ Mark Join',
+  status_history:'Status History',
+  status_toast_join:'✅ Status changed to Join.',status_toast_out:'🚪 Status changed to Out.',
+}};
+function t(k){return LANG[window._lang]?.[k]??LANG.id[k]??k;}
+function applyTranslations(){
+  document.querySelectorAll('[data-t]').forEach(el=>{el.textContent=t(el.dataset.t);});
+  document.querySelectorAll('[data-t-ph]').forEach(el=>{el.placeholder=t(el.dataset.tPh);});
+  document.querySelectorAll('[data-t-title]').forEach(el=>{el.title=t(el.dataset.tTitle);});
+  const lb=document.getElementById('lang-btn');
+  if(lb)lb.textContent=window._lang==='id'?'🇺🇸 EN':'🇮🇩 ID';
+  const hs=document.getElementById('app-sub');
+  if(hs)hs.textContent=t('hsub');
+}
+window.toggleLang=function(){
+  window._lang=window._lang==='id'?'en':'id';
+  localStorage.setItem('ilc-lang',window._lang);
+  applyTranslations();
+  renderNav();
+  rerender();
+};
 
 // ════════════════════════════════════════
 //  THEME
@@ -591,7 +795,7 @@ async function saveWeeks() {
 
 function setFbStatus(ok) {
   document.getElementById('fb-dot').className = 'fb-dot ' + (ok ? 'ok' : 'err');
-  document.getElementById('fb-lbl').textContent = ok ? 'Terhubung' : 'Offline';
+  document.getElementById('fb-lbl').textContent = ok ? t('fb_connected') : t('fb_offline');
 }
 
 // ════════════════════════════════════════
@@ -610,24 +814,24 @@ window.doLogin = async function() {
   const btn   = document.getElementById('li-btn');
   const err   = document.getElementById('li-err');
   err.classList.remove('show');
-  if (!email || !pass) { showErr('li-err','Email dan password wajib diisi.'); return; }
-  btn.disabled = true; btn.textContent = 'Memproses…';
+  if (!email || !pass) { showErr('li-err', t('login_empty')); return; }
+  btn.disabled = true; btn.textContent = t('login_processing');
   try {
     await signInWithEmailAndPassword(auth, email, pass);
     closeLoginModal();
-    toast('✅ Login berhasil! Selamat datang, Admin.','success');
+    toast(t('login_success'),'success');
   } catch(e) {
-    let msg = 'Login gagal. Periksa email & password.';
-    if (e.code === 'auth/user-not-found' || e.code === 'auth/wrong-password' || e.code === 'auth/invalid-credential') msg = 'Email atau password salah.';
-    if (e.code === 'auth/too-many-requests') msg = 'Terlalu banyak percobaan. Coba lagi nanti.';
+    let msg = t('login_fail');
+    if (e.code === 'auth/user-not-found' || e.code === 'auth/wrong-password' || e.code === 'auth/invalid-credential') msg = t('login_wrong_cred');
+    if (e.code === 'auth/too-many-requests') msg = t('login_too_many');
     showErr('li-err', msg);
   }
-  btn.disabled = false; btn.textContent = '🔑 Masuk';
+  btn.disabled = false; btn.textContent = t('login_btn');
 };
 
 window.doLogout = async function() {
   await signOut(auth);
-  toast('👋 Logout berhasil.','info');
+  toast(t('logout_success'),'info');
 };
 
 window.adminPillClick = function() {
@@ -639,18 +843,12 @@ window.adminPillClick = function() {
 //  UI UPDATER
 // ════════════════════════════════════════
 function updateUI() {
-  // week pill
   document.getElementById('week-pill').textContent = S.currentWeekKey;
-  // admin pill
-  const dot  = document.getElementById('adot');
-  const lbl  = document.getElementById('apill-lbl');
-  if (S.isAdmin) {
-    dot.className = 'admin-dot';
-    lbl.textContent = '👑 Admin — Logout';
-  } else {
-    dot.className = 'admin-dot off';
-    lbl.textContent = '🔒 Login Admin';
-  }
+  const dot = document.getElementById('adot');
+  const lbl = document.getElementById('apill-lbl');
+  if (S.isAdmin) { dot.className='admin-dot'; lbl.textContent=t('admin_logout'); }
+  else { dot.className='admin-dot off'; lbl.textContent=t('admin_login_lock'); }
+  applyTranslations();
   renderNav();
   rerender();
 }
@@ -660,25 +858,24 @@ function renderNav() {
   const nav = document.getElementById('nav-bar');
   nav.innerHTML = `
     <button class="nav-btn ${activeTab==='summary'?'active':''}" onclick="showTab('summary')">
-      <span>📊</span><span class="tab-txt">Summary</span>
+      <span>📊</span><span class="tab-txt">${t('tab_summary')}</span>
     </button>
     <button class="nav-btn ${activeTab==='history'?'active':''}" onclick="showTab('history')">
-      <span>📜</span><span class="tab-txt">History</span>
+      <span>📜</span><span class="tab-txt">${t('tab_history')}</span>
     </button>
     <button class="nav-btn ${activeTab==='alwaysfail'?'active':''}" onclick="showTab('alwaysfail')">
-      <span>🚨</span><span class="tab-txt">Sering Gagal</span>
+      <span>🚨</span><span class="tab-txt">${t('tab_alwaysfail')}</span>
     </button>
     ${S.isAdmin ? `
     <button class="nav-btn ${activeTab==='fail'?'active':''}" onclick="showTab('fail')">
-      <span>❌</span><span class="tab-txt">Input Fail</span>
+      <span>❌</span><span class="tab-txt">${t('tab_inputfail')}</span>
       <span class="nbadge">${failCount}</span>
     </button>
     <button class="nav-btn ${activeTab==='master'?'active':''}" onclick="showTab('master')">
-      <span>👥</span><span class="tab-txt">Master Member</span>
+      <span>👥</span><span class="tab-txt">${t('tab_master')}</span>
       <span class="nbadge">${S.members.length}</span>
     </button>` : ''}
   `;
-  // redirect if current tab is admin-only and user logged out
   if (!S.isAdmin && (activeTab === 'master' || activeTab === 'fail')) {
     activeTab = 'summary';
   }
@@ -687,7 +884,7 @@ function renderNav() {
 let activeTab = 'summary';
 window.showTab = function(tab) {
   if (!S.isAdmin && (tab==='master'||tab==='fail')) {
-    toast('🔒 Halaman ini khusus Admin.','error'); return;
+    toast(t('admin_only'),'error'); return;
   }
   activeTab = tab;
   ['master','fail','summary','history','alwaysfail'].forEach(t => {
@@ -714,6 +911,21 @@ showTab('summary');
 // ════════════════════════════════════════
 function getFailIds(wk) { return S.weeks[wk] || []; }
 function memberById(id) { return S.members.find(m=>m.id===id); }
+function getToday() { return new Date().toISOString().slice(0,10); }
+function activeMembers() { return S.members.filter(m=>(m.status||'join')==='join'); }
+window.toggleStatus = async function(id) {
+  const m = S.members.find(m=>m.id===id);
+  if (!m) return;
+  m.status = (m.status||'join')==='join' ? 'out' : 'join';
+  if (!m.statusHistory) m.statusHistory=[];
+  m.statusHistory.push({s:m.status, d:getToday()});
+  await saveMembers();
+  toast(m.status==='join'?t('status_toast_join'):t('status_toast_out'),'success');
+};
+window.togStatusHist = function(id) {
+  const el=document.getElementById('sh-'+id);
+  if(el) el.classList.toggle('open');
+};
 function esc(s) {
   return String(s).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;');
 }
@@ -724,18 +936,39 @@ function getPrevWeek(refKey) {
   return idx > 0 ? keys[idx-1] : null;
 }
 function computeSummary(refKey) {
-  const wk   = refKey || S.currentWeekKey;
-  const cur  = getFailIds(wk);
+  const wk    = refKey || S.currentWeekKey;
+  const cur   = getFailIds(wk);
   const prevK = getPrevWeek(wk);
-  const prev = prevK ? getFailIds(prevK) : [];
-  const demote=[], promote=[], stable=[];
-  for (const m of S.members) {
-    if (cur.includes(m.id))               demote.push(m);
-    else if (prev.includes(m.id))         promote.push(m);
-    else                                  stable.push(m);
+  const prev  = prevK ? getFailIds(prevK) : [];
+  const demote=[], promote=[], stable=[], r2fail=[];
+  for (const m of activeMembers()) {
+    const inCur  = cur.includes(m.id);
+    const inPrev = prev.includes(m.id);
+    if (inCur && m.rank === 'R3')              demote.push(m);   // R3 gagal → turun ke R2
+    else if (inCur && m.rank === 'R2')         r2fail.push(m);   // R2 gagal → sudah di bawah, tidak berubah
+    else if (!inCur && inPrev && m.rank==='R2')promote.push(m);  // R2 minggu lalu gagal, kini tidak → naik ke R3
+    else                                       stable.push(m);
   }
-  return { demote, promote, stable };
+  return { demote, promote, stable, r2fail };
 }
+window.applyRanks = async function(refKey) {
+  const {demote, promote} = computeSummary(refKey);
+  let changed = 0;
+  for (const m of demote) {
+    const mb = S.members.find(x => x.id === m.id);
+    if (mb && mb.rank !== 'R2') { mb.rank = 'R2'; changed++; }
+  }
+  for (const m of promote) {
+    const mb = S.members.find(x => x.id === m.id);
+    if (mb && mb.rank !== 'R3') { mb.rank = 'R3'; changed++; }
+  }
+  if (changed) {
+    await saveMembers();
+    toast(`✅ ${changed} ${t('rank_applied')} (${demote.length} ${t('rank_demote_lbl')}, ${promote.length} ${t('rank_promote_lbl')}).`, 'success');
+  } else {
+    toast(t('rank_no_change'), 'info');
+  }
+};
 function toast(msg, type='info') {
   const el = document.getElementById('toast');
   el.textContent = msg;
@@ -771,7 +1004,7 @@ window.openEdit = function(id) {
   const m = memberById(id);
   if (!m) return;
   editId = id;
-  document.getElementById('edit-sub').textContent = `Nama saat ini: "${m.name}"`;
+  document.getElementById('edit-sub').textContent = `${t('edit_sub_cur')} "${m.name}"`;
   const inp = document.getElementById('edit-inp');
   inp.value = m.name;
   document.getElementById('edit-err').classList.remove('show');
@@ -784,12 +1017,12 @@ window.closeEdit = function() {
 };
 window.saveEdit = async function() {
   const name = document.getElementById('edit-inp').value.trim();
-  if (!name) { showErr('edit-err','Nama tidak boleh kosong!'); return; }
+  if (!name) { showErr('edit-err', t('edit_empty')); return; }
   if (S.members.find(m=>m.name.toLowerCase()===name.toLowerCase()&&m.id!==editId)) {
-    showErr('edit-err','Nama sudah dipakai member lain!'); return;
+    showErr('edit-err', t('edit_dup')); return;
   }
   const m = S.members.find(m=>m.id===editId);
-  if (m) { m.name=name; await saveMembers(); closeEdit(); toast('✅ Nama berhasil diubah.','success'); }
+  if (m) { m.name=name; await saveMembers(); closeEdit(); toast(t('edit_success'),'success'); }
 };
 document.getElementById('edit-modal').addEventListener('click', e => {
   if (e.target===document.getElementById('edit-modal')) closeEdit();
@@ -800,8 +1033,14 @@ document.getElementById('edit-modal').addEventListener('click', e => {
 // ════════════════════════════════════════
 let msearch='';
 function getMasterList() {
-  return S.members.filter(m=>m.name.toLowerCase().includes(msearch.toLowerCase()))
-                  .slice().sort((a,b)=>a.name.localeCompare(b.name));
+  return S.members
+    .filter(m=>m.name.toLowerCase().includes(msearch.toLowerCase()))
+    .slice()
+    .sort((a,b)=>{
+      const sa=a.status||'join', sb=b.status||'join';
+      if(sa!==sb) return sa==='join'?-1:1;
+      return a.name.localeCompare(b.name);
+    });
 }
 function renderMasterList() {
   // Hanya update bagian list — input pencarian TIDAK disentuh agar fokus tidak hilang
@@ -811,19 +1050,32 @@ function renderMasterList() {
   const list = getMasterList();
   if (counter) counter.textContent = S.members.length;
   container.innerHTML = list.length===0
-    ? `<div class="empty"><div class="empty-ico">🪖</div><div class="empty-txt">Belum ada member${msearch?' cocok':''}</div></div>`
-    : `<div class="mlist">${list.map((m,i)=>`
-        <div class="mrow">
-          <span class="mnum">${i+1}</span>
-          <span class="mname">${esc(m.name)}</span>
-          <span class="rbadge r-${m.rank.toLowerCase()}">${m.rank}</span>
-          <select class="finput" style="width:68px;padding:4px 8px;font-size:12px" onchange="changeRank('${m.id}',this.value)">
-            <option ${m.rank==='R2'?'selected':''}>R2</option>
-            <option ${m.rank==='R3'?'selected':''}>R3</option>
-          </select>
-          <button class="btn btn-blue btn-sm" onclick="openEdit('${m.id}')">✏️</button>
-          <button class="btn btn-red btn-sm" onclick="delMember('${m.id}')">✕</button>
-        </div>`).join('')}
+    ? `<div class="empty"><div class="empty-ico">🪖</div><div class="empty-txt">${msearch?t('master_empty_search'):t('master_empty')}</div></div>`
+    : `<div class="mlist">${list.map((m,i)=>{
+        const st = m.status||'join';
+        const hist = m.statusHistory||[];
+        const histHtml = hist.length
+          ? hist.map(h=>`${h.s==='join'?'✅':'🚪'} <strong>${h.s}</strong> — ${h.d}`).join('<br>')
+          : `<span style="color:var(--muted)">—</span>`;
+        return `
+          <div class="mrow" style="${st==='out'?'opacity:.55;':''}">
+            <span class="mnum">${i+1}</span>
+            <span class="mname">${esc(m.name)}</span>
+            <span class="rbadge r-${m.rank.toLowerCase()}">${m.rank}</span>
+            <span class="sbadge ${st==='join'?'s-join':'s-out'}">${t('status_'+st)}</span>
+            <button class="btn ${st==='join'?'btn-ghost':'btn-gold'} btn-sm" onclick="toggleStatus('${m.id}')">${st==='join'?t('status_toggle_out'):t('status_toggle_join')}</button>
+            <button class="btn btn-ghost btn-sm" onclick="togStatusHist('${m.id}')" title="${t('status_history')}">📋</button>
+            <select class="finput" style="width:68px;padding:4px 8px;font-size:12px" onchange="changeRank('${m.id}',this.value)">
+              <option ${m.rank==='R2'?'selected':''}>R2</option>
+              <option ${m.rank==='R3'?'selected':''}>R3</option>
+            </select>
+            <button class="btn btn-blue btn-sm" onclick="openEdit('${m.id}')">✏️</button>
+            <button class="btn btn-red btn-sm" onclick="delMember('${m.id}')">✕</button>
+          </div>
+          <div class="shist" id="sh-${m.id}">
+            <strong>${t('status_history')}:</strong><br>${histHtml}
+          </div>`;
+      }).join('')}
       </div>`;
 }
 window.setMsearch = function(v){ msearch=v; renderMasterList(); };
@@ -836,10 +1088,10 @@ function renderMaster() {
   }
   page.innerHTML = `
     <div class="card">
-      <div class="card-hd"><div class="card-title">➕ Tambah Member</div></div>
+      <div class="card-hd"><div class="card-title">${t('master_add_title')}</div></div>
       <div style="display:flex;gap:10px;flex-wrap:wrap">
         <div style="flex:2;min-width:160px">
-          <input class="finput" id="add-n" placeholder="Nama member..." onkeydown="if(event.key==='Enter')addMember()">
+          <input class="finput" id="add-n" placeholder="${t('master_add_ph')}" onkeydown="if(event.key==='Enter')addMember()">
         </div>
         <div style="flex:1;min-width:90px">
           <select class="finput" id="add-r">
@@ -847,17 +1099,17 @@ function renderMaster() {
             <option value="R3" selected>R3</option>
           </select>
         </div>
-        <button class="btn btn-gold" onclick="addMember()">+ Tambah</button>
+        <button class="btn btn-gold" onclick="addMember()">${t('master_add_btn')}</button>
       </div>
     </div>
 
     <div class="card">
       <div class="card-hd">
-        <div class="card-title">👥 Daftar Member <span id="master-count" style="color:var(--muted);font-size:13px;font-weight:400">(${S.members.length})</span></div>
-        <button class="btn btn-ghost btn-sm" onclick="showImport()">⬆ Import</button>
+        <div class="card-title">${t('master_list_title')} <span id="master-count" style="color:var(--muted);font-size:13px;font-weight:400">(${S.members.length})</span></div>
+        <button class="btn btn-ghost btn-sm" onclick="showImport()">${t('master_import_btn')}</button>
       </div>
       <div class="sbar"><span class="sicon">🔍</span>
-        <input class="finput" id="master-search" style="padding-left:36px" placeholder="Cari nama..."
+        <input class="finput" id="master-search" style="padding-left:36px" placeholder="${t('master_search_ph')}"
           oninput="setMsearch(this.value)" autocomplete="off">
       </div>
       <div id="master-list-wrap"></div>
@@ -866,12 +1118,12 @@ function renderMaster() {
     <!-- Import Modal -->
     <div id="imp-modal" style="display:none;position:fixed;inset:0;background:rgba(0,0,0,.75);z-index:300;align-items:center;justify-content:center;backdrop-filter:blur(4px)">
       <div style="background:var(--bg3);border:1px solid var(--border2);border-radius:16px;padding:26px;width:90%;max-width:460px;animation:slideUp .2s ease">
-        <div class="card-title" style="margin-bottom:12px">⬆ Import Member (satu nama per baris)</div>
-        <div class="alert alert-info">Duplikat nama akan diabaikan otomatis. Semua ditambahkan sebagai R3.</div>
-        <textarea class="finput" id="imp-txt" rows="8" placeholder="NamaMember1&#10;NamaMember2&#10;..." style="resize:vertical"></textarea>
+        <div class="card-title" style="margin-bottom:12px">${t('master_import_title')}</div>
+        <div class="alert alert-info">${t('master_import_hint')}</div>
+        <textarea class="finput" id="imp-txt" rows="8" placeholder="${t('master_import_ph').replace(/\n/g,'&#10;')}" style="resize:vertical"></textarea>
         <div style="display:flex;gap:8px;margin-top:12px;justify-content:flex-end">
-          <button class="btn btn-ghost" onclick="hideImport()">Batal</button>
-          <button class="btn btn-gold" onclick="doImport()">Import</button>
+          <button class="btn btn-ghost" onclick="hideImport()">${t('master_import_cancel')}</button>
+          <button class="btn btn-gold" onclick="doImport()">${t('master_import_do')}</button>
         </div>
       </div>
     </div>
@@ -886,33 +1138,33 @@ window.doImport   = async function() {
   let added=0;
   for (const name of lines) {
     if (!S.members.find(m=>m.name.toLowerCase()===name.toLowerCase())) {
-      S.members.push({id:'id_'+Date.now()+'_'+Math.random().toString(36).slice(2), name, rank:'R3'});
+      S.members.push({id:'id_'+Date.now()+'_'+Math.random().toString(36).slice(2), name, rank:'R3', status:'join', statusHistory:[{s:'join',d:getToday()}]});
       added++;
     }
   }
-  if (added) { await saveMembers(); hideImport(); toast(`✅ ${added} member diimport!`,'success'); }
-  else { toast('Tidak ada member baru yang ditambahkan.','info'); }
+  if (added) { await saveMembers(); hideImport(); toast(`✅ ${added} ${t('master_imported')}`,'success'); }
+  else { toast(t('master_import_none'),'info'); }
 };
 window.addMember = async function() {
   const name=document.getElementById('add-n').value.trim();
   const rank=document.getElementById('add-r').value;
   if (!name) return;
-  if (S.members.find(m=>m.name.toLowerCase()===name.toLowerCase())) { toast('❌ Nama sudah ada!','error'); return; }
-  S.members.push({id:'id_'+Date.now(), name, rank});
+  if (S.members.find(m=>m.name.toLowerCase()===name.toLowerCase())) { toast(t('master_dup'),'error'); return; }
+  S.members.push({id:'id_'+Date.now(), name, rank, status:'join', statusHistory:[{s:'join',d:getToday()}]});
   await saveMembers();
   document.getElementById('add-n').value='';
-  toast('✅ Member ditambahkan.','success');
+  toast(t('master_added'),'success');
 };
 window.delMember = async function(id) {
-  if (!confirm('Hapus member ini?')) return;
+  if (!confirm(t('master_del_confirm'))) return;
   S.members = S.members.filter(m=>m.id!==id);
   for (const wk in S.weeks) S.weeks[wk]=S.weeks[wk].filter(i=>i!==id);
   await saveMembers(); await saveWeeks();
-  toast('🗑 Member dihapus.','info');
+  toast(t('master_deleted'),'info');
 };
 window.changeRank = async function(id, rank) {
   const m=S.members.find(m=>m.id===id);
-  if (m) { m.rank=rank; await saveMembers(); toast('✅ Rank diubah.','success'); }
+  if (m) { m.rank=rank; await saveMembers(); toast(t('master_rank_changed'),'success'); }
 };
 
 // ════════════════════════════════════════
@@ -927,31 +1179,32 @@ function renderFail() {
 
   page.innerHTML = `
     <div class="card">
-      <div class="card-hd"><div class="card-title">📅 Minggu Aktif</div></div>
-      <div class="alert alert-warn">⚠ Data fail untuk: <strong>${getWeekLabel(S.currentWeekKey)}</strong></div>
+      <div class="card-hd"><div class="card-title">${t('fail_week_title')}</div></div>
+      <div class="alert alert-warn">${t('fail_week_label')} <strong>${getWeekLabel(S.currentWeekKey)}</strong></div>
       <div style="display:flex;align-items:center;gap:10px;flex-wrap:wrap">
-        <span style="font-size:13px;color:var(--muted)">Ubah minggu:</span>
+        <span style="font-size:13px;color:var(--muted)">${t('fail_week_change')}</span>
         <input type="week" class="finput" style="width:auto" value="${S.currentWeekKey}" onchange="changeWeek(this.value)">
       </div>
     </div>
 
     <div class="card">
       <div class="card-hd">
-        <div class="card-title">❌ Member Gagal (${failIds.length})</div>
-        ${failIds.length?`<button class="btn btn-red btn-sm" onclick="clearFail()">Hapus Semua</button>`:''}
+        <div class="card-title">${t('fail_list_title')} (${failIds.length})</div>
+        ${failIds.length?`<button class="btn btn-red btn-sm" onclick="clearFail()">${t('fail_clear_btn')}</button>`:''}
       </div>
-      <div class="alert alert-info">💡 Ketik nama member yang gagal ≥7.2 juta poin, lalu Enter atau pilih dari daftar.</div>
+      <div class="alert alert-info">${t('fail_hint')}</div>
       <div class="acwrap" style="margin-bottom:14px">
-        <input class="finput" id="fi" placeholder="Cari nama member gagal..."
+        <input class="finput" id="fi" placeholder="${t('fail_search_ph')}"
           oninput="onFI(this.value)" onkeydown="onFK(event)">
         <div class="aclist" id="acl"></div>
       </div>
       <div class="ftags" id="ftags">
-        ${failMs.length===0?`<span style="color:var(--muted);font-size:13px">Belum ada input gagal minggu ini.</span>`:
+        ${failMs.length===0?`<span style="color:var(--muted);font-size:13px">${t('fail_empty')}</span>`:
           failMs.map(m=>`
-            <div class="ftag">
+            <div class="ftag" style="${m.rank==='R2'?'opacity:.6;':''}">
               <span class="rbadge r-${m.rank.toLowerCase()}" style="font-size:10px;padding:1px 6px">${m.rank}</span>
               ${esc(m.name)}
+              ${m.rank==='R2'?`<span style="font-size:10px;color:var(--muted);font-style:italic">${t('fail_r2_note')}</span>`:''}
               <button onclick="remFail('${m.id}')">✕</button>
             </div>`).join('')}
       </div>
@@ -965,16 +1218,16 @@ window.changeWeek = function(v) {
   renderFail(); renderNav();
 };
 window.clearFail = async function() {
-  if (!confirm('Hapus semua fail minggu ini?')) return;
+  if (!confirm(t('fail_clear_confirm'))) return;
   S.weeks[S.currentWeekKey]=[];
-  await saveWeeks(); toast('🗑 Data fail dihapus.','info');
+  await saveWeeks(); toast(t('fail_cleared'),'info');
 };
 window.onFI = function(v) {
   fsearch=v.trim(); acIdx=-1;
   const ac=document.getElementById('acl');
   if (!fsearch) { ac.classList.remove('open'); return; }
   const ids=getFailIds(S.currentWeekKey);
-  const hits=S.members.filter(m=>m.name.toLowerCase().includes(fsearch.toLowerCase())&&!ids.includes(m.id)).slice(0,8);
+  const hits=activeMembers().filter(m=>m.name.toLowerCase().includes(fsearch.toLowerCase())&&!ids.includes(m.id)).slice(0,8);
   if (!hits.length) { ac.classList.remove('open'); return; }
   ac.innerHTML=hits.map(m=>`
     <div class="acitem" data-id="${m.id}" onclick="addFail('${m.id}')">
@@ -1000,7 +1253,7 @@ window.addFail = async function(id) {
   if (!S.weeks[S.currentWeekKey].includes(id)) {
     S.weeks[S.currentWeekKey].push(id);
     await saveWeeks();
-    toast('✅ Member ditambahkan ke daftar gagal.','success');
+    toast(t('fail_added'),'success');
   }
   const fi=document.getElementById('fi');
   if(fi){fi.value='';const ac=document.getElementById('acl');if(ac)ac.classList.remove('open');}
@@ -1011,7 +1264,7 @@ window.remFail = async function(id) {
   if (S.weeks[S.currentWeekKey]) {
     S.weeks[S.currentWeekKey]=S.weeks[S.currentWeekKey].filter(i=>i!==id);
     await saveWeeks();
-    toast('✅ Member dihapus dari daftar gagal.','success');
+    toast(t('fail_removed'),'success');
     renderFail();
   }
 };
@@ -1026,11 +1279,10 @@ document.addEventListener('click', e => {
 function renderSummary() {
   const page=document.getElementById('page-summary');
   if (!S.loaded || !S.members.length) {
-    page.innerHTML=`<div class="card"><div class="loading-wrap"><div class="spinner"></div>Memuat data…</div></div>`;
+    page.innerHTML=`<div class="card"><div class="loading-wrap"><div class="spinner"></div>${t('loading')}</div></div>`;
     return;
   }
 
-  // Hanya gunakan week yang benar-benar punya data (ada di S.weeks)
   const inputtedWeekKeys = Object.keys(S.weeks).sort().reverse();
   const allWeekKeys = inputtedWeekKeys.length ? inputtedWeekKeys : [S.currentWeekKey];
 
@@ -1040,7 +1292,7 @@ function renderSummary() {
   }
 
   const selWeek = S.summaryWeekKey;
-  const {demote,promote,stable}=computeSummary(selWeek);
+  const {demote,promote,stable,r2fail}=computeSummary(selWeek);
   const prevKey=getPrevWeek(selWeek);
   const isCurrentWeek = selWeek === S.currentWeekKey;
 
@@ -1048,63 +1300,79 @@ function renderSummary() {
     const isNow = wk === S.currentWeekKey;
     const isLatest = wk === allWeekKeys[0];
     let label = getWeekLabel(wk);
-    if (isLatest) label += ' 🔴 (Terbaru)';
-    else if (isNow) label += ' ★ (Minggu Ini)';
+    if (isLatest) label += ' ' + t('summary_week_latest');
+    else if (isNow) label += ' ' + t('summary_week_now');
     return `<option value="${wk}" ${wk===selWeek?'selected':''}>${label}</option>`;
   }).join('');
 
   page.innerHTML=`
-    ${!S.isAdmin?`<div class="pub-banner">👁 Mode Publik — Hanya bisa melihat. Login sebagai Admin untuk mengedit. <button class="btn btn-ghost btn-sm" style="margin-left:auto" onclick="openLoginModal()">🔑 Login</button></div>`:''}
+    ${!S.isAdmin?`<div class="pub-banner">${t('pub_view_only')} <button class="btn btn-ghost btn-sm" style="margin-left:auto" onclick="openLoginModal()">${t('pub_login_btn')}</button></div>`:''}
     <div class="card">
       <div class="card-hd">
-        <div class="card-title">📊 Summary Rekap</div>
-        <button class="btn btn-ghost btn-sm" onclick="exportSummary()">⬇ Export</button>
+        <div class="card-title">${t('summary_title')}</div>
+        <div style="display:flex;gap:8px;flex-wrap:wrap">
+          ${S.isAdmin ? `<button class="btn btn-gold btn-sm" onclick="applyRanks('${selWeek}')">${t('summary_apply_btn')}</button>` : ''}
+          <button class="btn btn-ghost btn-sm" onclick="exportSummary()">${t('summary_export_btn')}</button>
+        </div>
       </div>
       <div style="display:flex;align-items:center;gap:10px;flex-wrap:wrap;margin-bottom:14px">
-        <span style="font-size:12px;font-weight:600;color:var(--muted);text-transform:uppercase;letter-spacing:.6px;white-space:nowrap">📅 Pilih Minggu:</span>
+        <span style="font-size:12px;font-weight:600;color:var(--muted);text-transform:uppercase;letter-spacing:.6px;white-space:nowrap">${t('summary_week_label')}</span>
         <select class="finput" style="flex:1;min-width:200px;max-width:400px" onchange="changeSummaryWeek(this.value)">
           ${weekOptions}
         </select>
       </div>
       <div class="alert alert-info">
         📅 <strong>${getWeekLabel(selWeek)}</strong>
-        ${selWeek===allWeekKeys[0]?' <span style="background:rgba(46,204,113,.15);color:var(--green2);font-size:11px;padding:2px 8px;border-radius:10px;font-weight:600;margin-left:4px">TERBARU</span>':''}
-        ${prevKey?` — dibanding ${getWeekLabel(prevKey)}`:'— (belum ada data minggu sebelumnya)'}
+        ${selWeek===allWeekKeys[0]?` <span style="background:rgba(46,204,113,.15);color:var(--green2);font-size:11px;padding:2px 8px;border-radius:10px;font-weight:600;margin-left:4px">${t('summary_latest_badge')}</span>`:''}
+        ${prevKey?` ${t('summary_vs')} ${getWeekLabel(prevKey)}`:t('summary_no_prev')}
       </div>
       <div class="stats">
-        <div class="sbox"><div class="snum c-gold">${S.members.length}</div><div class="slbl">Total Member</div></div>
-        <div class="sbox"><div class="snum c-red">${demote.length}</div><div class="slbl">⬇ Demote</div></div>
-        <div class="sbox"><div class="snum c-green">${promote.length}</div><div class="slbl">⬆ Promote</div></div>
-        <div class="sbox"><div class="snum c-blue">${stable.length}</div><div class="slbl">✓ Stabil</div></div>
+        <div class="sbox"><div class="snum c-gold">${activeMembers().length}</div><div class="slbl">${t('summary_total')}</div></div>
+        <div class="sbox"><div class="snum c-red">${demote.length}</div><div class="slbl">${t('summary_demote')}</div></div>
+        <div class="sbox"><div class="snum c-green">${promote.length}</div><div class="slbl">${t('summary_promote')}</div></div>
+        <div class="sbox"><div class="snum c-blue">${stable.length}</div><div class="slbl">${t('summary_stable')}</div></div>
+        ${r2fail.length ? `<div class="sbox"><div class="snum" style="color:var(--muted)">${r2fail.length}</div><div class="slbl">${t('summary_r2fail')}</div></div>` : ''}
       </div>
     </div>
 
     <div class="sgrid">
       <div class="scard dem">
-        <div class="scard-hd">⬇ DEMOTE ke R2 (${demote.length})</div>
-        ${demote.length===0?`<div style="color:var(--muted);font-size:13px">Tidak ada yang demote minggu ini 🎉</div>`:
+        <div class="scard-hd">${t('demote_card')} (${demote.length})</div>
+        ${demote.length===0?`<div style="color:var(--muted);font-size:13px">${t('demote_empty')}</div>`:
           demote.map(m=>`
             <div class="smrow">
               <span style="font-size:15px">⬇</span>
               <span style="flex:1;font-size:13px;font-weight:500">${esc(m.name)}</span>
-              <span style="font-size:11px;color:var(--red2)">→ R2</span>
+              <span style="font-size:11px;color:var(--red2)">${t('demote_arrow')}</span>
             </div>`).join('')}
       </div>
       <div class="scard pro">
-        <div class="scard-hd">⬆ PROMOTE ke R3 (${promote.length})</div>
-        ${promote.length===0?`<div style="color:var(--muted);font-size:13px">Belum ada yang promote minggu ini.</div>`:
+        <div class="scard-hd">${t('promote_card')} (${promote.length})</div>
+        ${promote.length===0?`<div style="color:var(--muted);font-size:13px">${t('promote_empty')}</div>`:
           promote.map(m=>`
             <div class="smrow">
               <span style="font-size:15px">⬆</span>
               <span style="flex:1;font-size:13px;font-weight:500">${esc(m.name)}</span>
-              <span style="font-size:11px;color:var(--green2)">→ R3</span>
+              <span style="font-size:11px;color:var(--green2)">${t('promote_arrow')}</span>
             </div>`).join('')}
       </div>
     </div>
 
+    ${r2fail.length ? `
     <div class="card">
       <div class="card-hd">
-        <div class="card-title">✅ Stabil R3 (${stable.length})</div>
+        <div class="card-title" style="color:var(--muted)">${t('r2fail_card')} (${r2fail.length})</div>
+        <span class="nbadge">${r2fail.length}</span>
+      </div>
+      <div class="alert alert-warn" style="margin-bottom:10px">${t('r2fail_desc')}</div>
+      <div style="display:flex;flex-wrap:wrap;gap:8px">
+        ${r2fail.map(m=>`<span style="background:var(--surface);border:1px solid var(--border2);color:var(--muted);font-size:12px;padding:4px 12px;border-radius:20px">${esc(m.name)}</span>`).join('')}
+      </div>
+    </div>` : ''}
+
+    <div class="card">
+      <div class="card-hd">
+        <div class="card-title">${t('stable_card')} (${stable.length})</div>
         <span class="nbadge">${stable.length}</span>
       </div>
       <div style="display:flex;flex-wrap:wrap;gap:8px">
@@ -1121,19 +1389,23 @@ window.changeSummaryWeek = function(v) {
 };
 window.exportSummary = function() {
   const selWeek = S.summaryWeekKey;
-  const {demote,promote,stable}=computeSummary(selWeek);
+  const {demote,promote,stable,r2fail}=computeSummary(selWeek);
   const prevKey=getPrevWeek(selWeek);
-  let txt=`REKAP PROMOTE & DEMOTE — Last War ILC #228\n`;
-  txt+=`Minggu: ${getWeekLabel(selWeek)}\n`;
-  if(prevKey) txt+=`Dibanding: ${getWeekLabel(prevKey)}\n`;
+  let txt=`${t('export_hdr')}\n`;
+  txt+=`${t('export_week')} ${getWeekLabel(selWeek)}\n`;
+  if(prevKey) txt+=`${t('export_vs')} ${getWeekLabel(prevKey)}\n`;
   txt+=`\n${'='.repeat(44)}\n`;
-  txt+=`\n⬇ DEMOTE KE R2 (${demote.length}):\n`;
+  txt+=`\n${t('export_demote')} (${demote.length}):\n`;
   demote.forEach((m,i)=>txt+=`  ${i+1}. ${m.name}\n`);
-  txt+=`\n⬆ PROMOTE KE R3 (${promote.length}):\n`;
+  txt+=`\n${t('export_promote')} (${promote.length}):\n`;
   promote.forEach((m,i)=>txt+=`  ${i+1}. ${m.name}\n`);
-  txt+=`\n✅ STABIL R3 (${stable.length}):\n`;
+  txt+=`\n${t('export_stable')} (${stable.length}):\n`;
   stable.forEach((m,i)=>txt+=`  ${i+1}. ${m.name}\n`);
-  txt+=`\n${'='.repeat(44)}\nTotal member: ${S.members.length}\n`;
+  if(r2fail.length){
+    txt+=`\n${t('export_r2fail')} (${r2fail.length}):\n`;
+    r2fail.forEach((m,i)=>txt+=`  ${i+1}. ${m.name}\n`);
+  }
+  txt+=`\n${'='.repeat(44)}\n${t('export_total')} ${S.members.length}\n`;
   const a=document.createElement('a');
   a.href=URL.createObjectURL(new Blob([txt],{type:'text/plain'}));
   a.download=`rekap_${S.summaryWeekKey}.txt`;a.click();
@@ -1147,14 +1419,14 @@ function renderHistory() {
   const keys=Object.keys(S.weeks).sort().reverse();
   if (!keys.length) {
     page.innerHTML=`
-      ${!S.isAdmin?`<div class="pub-banner">👁 Mode Publik — Login sebagai Admin untuk mengedit. <button class="btn btn-ghost btn-sm" style="margin-left:auto" onclick="openLoginModal()">🔑 Login</button></div>`:''}
-      <div class="card"><div class="empty"><div class="empty-ico">📜</div><div class="empty-txt">Belum ada data history.</div></div></div>`;
+      ${!S.isAdmin?`<div class="pub-banner">${t('pub_edit_only')} <button class="btn btn-ghost btn-sm" style="margin-left:auto" onclick="openLoginModal()">${t('pub_login_btn')}</button></div>`:''}
+      <div class="card"><div class="empty"><div class="empty-ico">📜</div><div class="empty-txt">${t('history_empty')}</div></div></div>`;
     return;
   }
   page.innerHTML=`
-    ${!S.isAdmin?`<div class="pub-banner">👁 Mode Publik — Login sebagai Admin untuk mengedit. <button class="btn btn-ghost btn-sm" style="margin-left:auto" onclick="openLoginModal()">🔑 Login</button></div>`:''}
+    ${!S.isAdmin?`<div class="pub-banner">${t('pub_edit_only')} <button class="btn btn-ghost btn-sm" style="margin-left:auto" onclick="openLoginModal()">${t('pub_login_btn')}</button></div>`:''}
     <div class="card">
-      <div class="card-hd"><div class="card-title">📜 History Fail Per Minggu</div></div>
+      <div class="card-hd"><div class="card-title">${t('history_title')}</div></div>
       ${keys.map((wk,i)=>{
         const ids=getFailIds(wk);
         const ms=ids.map(id=>memberById(id)).filter(Boolean);
@@ -1164,14 +1436,14 @@ function renderHistory() {
             <div class="hhd" onclick="togH('hb-${i}','hc-${i}')">
               <div class="htitle-w">
                 ${isCur?'🔴 ':''}${getWeekLabel(wk)}
-                <span class="nbadge">${ids.length} fail</span>
+                <span class="nbadge">${ids.length} ${t('history_fail_badge')}</span>
               </div>
               <span class="chev" id="hc-${i}">▼</span>
             </div>
             <div class="hbody" id="hb-${i}">
-              ${ms.length===0?'<span style="color:var(--muted);font-size:13px">Tidak ada member fail.</span>':
+              ${ms.length===0?`<span style="color:var(--muted);font-size:13px">${t('history_no_fail')}</span>`:
                 ms.map(m=>`<span class="fpill">${esc(m.name)}</span>`).join('')}
-              ${S.isAdmin?`<div style="margin-top:12px"><button class="btn btn-red btn-sm" onclick="delWeek('${wk}');event.stopPropagation()">🗑 Hapus Minggu Ini</button></div>`:''}
+              ${S.isAdmin?`<div style="margin-top:12px"><button class="btn btn-red btn-sm" onclick="delWeek('${wk}');event.stopPropagation()">${t('history_del_btn')}</button></div>`:''}
             </div>
           </div>`;
       }).join('')}
@@ -1183,9 +1455,9 @@ window.togH = function(bid,cid) {
   document.getElementById(cid).classList.toggle('open');
 };
 window.delWeek = async function(wk) {
-  if (!confirm(`Hapus data fail untuk ${getWeekLabel(wk)}?`)) return;
+  if (!confirm(`${t('history_del_confirm')} ${getWeekLabel(wk)}?`)) return;
   delete S.weeks[wk];
-  await saveWeeks(); toast('🗑 Data minggu dihapus.','info');
+  await saveWeeks(); toast(t('history_deleted'),'info');
 };
 
 // ════════════════════════════════════════
@@ -1197,7 +1469,7 @@ function computeFailStats() {
   const weekKeys = Object.keys(S.weeks).sort();
   const totalWeeks = weekKeys.length;
   const stats = [];
-  for (const m of S.members) {
+  for (const m of activeMembers()) {
     const failWeeks = weekKeys.filter(wk => S.weeks[wk].includes(m.id));
     const failCount = failWeeks.length;
     if (failCount === 0) continue;
@@ -1215,7 +1487,7 @@ function computeFailStats() {
 function renderAlwaysFail() {
   const page = document.getElementById('page-alwaysfail');
   if (!S.loaded || !S.members.length) {
-    page.innerHTML = `<div class="card"><div class="loading-wrap"><div class="spinner"></div>Memuat data…</div></div>`;
+    page.innerHTML = `<div class="card"><div class="loading-wrap"><div class="spinner"></div>${t('loading')}</div></div>`;
     return;
   }
   const { stats, totalWeeks } = computeFailStats();
@@ -1225,31 +1497,31 @@ function renderAlwaysFail() {
   ).join('');
 
   page.innerHTML = `
-    ${!S.isAdmin ? `<div class="pub-banner">👁 Mode Publik — Login sebagai Admin untuk mengedit. <button class="btn btn-ghost btn-sm" style="margin-left:auto" onclick="openLoginModal()">🔑 Login</button></div>` : ''}
+    ${!S.isAdmin ? `<div class="pub-banner">${t('pub_edit_only')} <button class="btn btn-ghost btn-sm" style="margin-left:auto" onclick="openLoginModal()">${t('pub_login_btn')}</button></div>` : ''}
     <div class="card">
-      <div class="card-hd"><div class="card-title">🚨 Player Sering Gagal</div></div>
-      <div class="alert alert-warn">⚠ Berdasarkan <strong>${totalWeeks} minggu</strong> data history. Menampilkan player yang gagal minimal <strong>${minFailFilter}x</strong>.</div>
+      <div class="card-hd"><div class="card-title">${t('af_title')}</div></div>
+      <div class="alert alert-warn">⚠ ${t('af_desc_pre')} <strong>${totalWeeks} ${t('af_desc_week')}</strong> ${t('af_desc_mid')} <strong>${minFailFilter}x</strong>.</div>
       <div style="display:flex;gap:8px;flex-wrap:wrap;margin-bottom:14px;align-items:center">
-        <span style="font-size:12px;font-weight:600;color:var(--muted);text-transform:uppercase;letter-spacing:.6px">Filter min. fail:</span>
+        <span style="font-size:12px;font-weight:600;color:var(--muted);text-transform:uppercase;letter-spacing:.6px">${t('af_filter_lbl')}</span>
         ${filterBtns}
       </div>
       <div class="stats">
-        <div class="sbox"><div class="snum c-gold">${totalWeeks}</div><div class="slbl">Total Minggu</div></div>
-        <div class="sbox"><div class="snum c-red">${filtered.length}</div><div class="slbl">Player Bermasalah</div></div>
-        <div class="sbox"><div class="snum c-red">${stats.filter(s=>s.streak>=2).length}</div><div class="slbl">🔥 Streak ≥2</div></div>
+        <div class="sbox"><div class="snum c-gold">${totalWeeks}</div><div class="slbl">${t('af_stat_weeks')}</div></div>
+        <div class="sbox"><div class="snum c-red">${filtered.length}</div><div class="slbl">${t('af_stat_players')}</div></div>
+        <div class="sbox"><div class="snum c-red">${stats.filter(s=>s.streak>=2).length}</div><div class="slbl">${t('af_stat_streak')}</div></div>
       </div>
     </div>
     ${filtered.length === 0 ? `
       <div class="card"><div class="empty"><div class="empty-ico">🎉</div>
-        <div class="empty-txt">Tidak ada player yang gagal ≥${minFailFilter}x.</div>
+        <div class="empty-txt">${t('af_empty_pre')}${minFailFilter}x.</div>
       </div></div>` : `
     <div class="card">
-      <div class="card-hd"><div class="card-title">📋 Daftar Player (${filtered.length})</div></div>
+      <div class="card-hd"><div class="card-title">${t('af_list_title')} (${filtered.length})</div></div>
       <div class="mlist">
         ${filtered.map((s, i) => {
           const pct = totalWeeks > 0 ? Math.round(s.failCount / totalWeeks * 100) : 0;
           const streakBadge = s.streak >= 2
-            ? `<span style="background:rgba(231,76,60,.18);color:var(--red2);font-size:11px;padding:2px 8px;border-radius:10px;font-weight:600;white-space:nowrap">🔥 ${s.streak}x streak</span>`
+            ? `<span style="background:rgba(231,76,60,.18);color:var(--red2);font-size:11px;padding:2px 8px;border-radius:10px;font-weight:600;white-space:nowrap">🔥 ${s.streak}${t('af_streak')}</span>`
             : '';
           return `
             <div class="mrow" style="flex-direction:column;align-items:flex-start;gap:6px;padding:12px">
@@ -1264,7 +1536,7 @@ function renderAlwaysFail() {
                   <div style="height:100%;width:${pct}%;background:var(--red2);border-radius:4px"></div>
                 </div>
                 <div style="font-size:11px;color:var(--muted)">
-                  Fail di: ${s.failWeeks.map(wk => `<span style="background:var(--bg3);border:1px solid var(--border);border-radius:6px;padding:1px 7px;font-size:10px;margin:1px 2px;display:inline-block">${wk}</span>`).join('')}
+                  ${t('af_fail_at')} ${s.failWeeks.map(wk => `<span style="background:var(--bg3);border:1px solid var(--border);border-radius:6px;padding:1px 7px;font-size:10px;margin:1px 2px;display:inline-block">${wk}</span>`).join('')}
                 </div>
               </div>
             </div>`;
